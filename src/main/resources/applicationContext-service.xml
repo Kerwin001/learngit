@@ -1,0 +1,49 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd  http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd  http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd  http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <bean id="systemMenuService" class="com.xmg.pss.service.impl.SystemMenuServiceImpl">
+        <property name="systemMenuMapper" ref="systemMenuMapper"/>
+    </bean>
+    <bean id="brandService" class="com.xmg.pss.service.impl.BrandServiceImpl">
+        <property name="brandMapper" ref="brandMapper"/>
+    </bean>
+    <bean id="supplierService" class="com.xmg.pss.service.impl.SupplierServiceImpl">
+        <property name="supplierMapper" ref="supplierMapper"/>
+    </bean>
+    <bean id="productService" class="com.xmg.pss.service.impl.ProductServiceImpl">
+        <property name="productMapper" ref="productMapper"/>
+    </bean>
+    <bean id="orderbillService" class="com.xmg.pss.service.impl.OrderbillServiceImpl">
+        <property name="orderbillMapper" ref="orderbillMapper"/>
+    </bean>
+    <bean id="depotService" class="com.xmg.pss.service.impl.DepotServiceImpl">
+        <property name="depotMapper" ref="depotMapper"/>
+    </bean>
+    <bean id="stockIncomeBillService" class="com.xmg.pss.service.impl.StockIncomeBillServiceImpl">
+        <property name="stockIncomeBillMapper" ref="stockIncomeBillMapper"/>
+        <property name="productStockService" ref="productStockService"/>
+    </bean>
+    <bean id="stockOutcomeBillService" class="com.xmg.pss.service.impl.StockOutcomeBillServiceImpl">
+        <property name="stockOutcomeBillMapper" ref="stockOutcomeBillMapper"/>
+        <property name="productStockService" ref="productStockService"/>
+        <property name="saleAccountService" ref="saleAccountService"/>
+    </bean>
+    <bean id="productStockService" class="com.xmg.pss.service.impl.ProductStockServiceImpl">
+        <property name="productStockMapper" ref="productStockMapper"/>
+    </bean>
+    <bean id="clientService" class="com.xmg.pss.service.impl.ClientServiceImpl">
+        <property name="clientMapper" ref="clientMapper"/>
+    </bean>
+    <bean id="orderChartService" class="com.xmg.pss.service.impl.OrderChartServiceImpl">
+        <property name="orderChartMapper" ref="orderChartMapper"/>
+    </bean>
+    <bean id="saleAccountService" class="com.xmg.pss.service.impl.SaleAccountServiceImpl">
+        <property name="saleAccountMapper" ref="saleAccountMapper"/>
+    </bean>
+    <bean id="saleChartService" class="com.xmg.pss.service.impl.SaleChartServiceImpl">
+        <property name="saleChartMapper" ref="saleChartMapper"/>
+    </bean>
+</beans>

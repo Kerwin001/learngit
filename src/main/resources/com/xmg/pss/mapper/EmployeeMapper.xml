@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.EmployeeMapper">
+	<resultMap type="employee" id="base_mapping">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="password" property="password"/>
+		<result column="email" property="email"/>
+		<result column="age" property="age"/>
+		<result column="admin" property="admin"/>
+		<association property="dept" javaType="department">
+			<id column="dept_id" property="id"/>
+			<result column="dname" property="name"/>
+			<result column="sn" property="sn"/>
+		</association>
+		<collection property="roles" column="id" ofType="role" 
+		select="com.xmg.pss.mapper.RoleMapper.getRoleByEmployee"/>
+	</resultMap>
+	
+	<sql id="base_condition">
+		<where>
+			<if test="keyword!=null and keyword!=''">
+				(e.name LIKE CONCAT('%',#{keyword},'%')
+				OR
+				e.email LIKE CONCAT('%',#{keyword},'%'))
+			</if>
+			<if test="deptId!=null and deptId != -1">
+				AND e.dept_id = #{deptId}
+			</if>
+		</where> 
+	</sql>
+	
+	<sql id="base_column">
+		e.*,d.name as dname,d.sn
+	</sql>
+	
+	<insert id="save" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO employee(name,password,email,age,admin,dept_id)
+		VALUES(#{name},#{password},#{email},#{age},#{admin},#{dept.id})
+	</insert>
+	
+	<update id="update">
+		UPDATE employee 
+		<set>
+			<if test="name!=null and name!=''">name=#{name},</if>
+			<if test="password!=null">password=#{password},</if>
+			<if test="email!=null">email=#{email},</if>
+			<if test="age!=null">age=#{age},</if>
+			<if test="admin!=null">admin=#{admin},</if>
+			<if test="dept.id!=null and dept.id!=-1">dept_id=#{dept.id},</if>
+		</set>
+		WHERE id=#{id}
+	</update>
+	
+	<delete id="delete">
+		DELETE FROM employee WHERE id=#{id}
+	</delete>
+	
+	<select id="get" resultMap="base_mapping">
+		SELECT <include refid="base_column"/>
+		FROM employee e LEFT JOIN department d ON e.dept_id=d.id
+		WHERE e.id=#{id}
+	</select>
+	
+	<select id="list" resultMap="base_mapping">
+		SELECT <include refid="base_column"/>
+		FROM employee e LEFT JOIN department d ON e.dept_id=d.id
+	</select>
+	
+	<select id="getTotalCount" resultType="long">
+		SELECT COUNT(e.id) FROM employee e 
+		<include refid="base_condition"/>
+	</select>
+	
+	<select id="getListData" resultMap="base_mapping">
+		SELECT <include refid="base_column"/>
+		FROM employee e LEFT JOIN department d ON e.dept_id=d.id
+		<include refid="base_condition"/>
+		LIMIT #{beginIndex},#{pageSize}
+	</select>
+	
+	<insert id="updateRelation">
+		INSERT INTO employee_role VALUES(#{eId},#{rId})
+	</insert>
+	
+	<delete id="deleteRelationByEmployee">
+		DELETE FROM employee_role WHERE employee_id = #{eid}
+	</delete>
+	
+	<select id="checkLogin" resultMap="base_mapping">
+		SELECT * FROM employee WHERE name=#{username} AND password=#{password}
+	</select>
+
+	 <delete id="batchDelete">
+		 DELETE FROM employee WHERE id IN
+         <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+         </foreach>
+	 </delete>
+
+	 <delete id="batchDeleteRelation">
+		 DELETE FROM employee_role WHERE employee_id IN
+         <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+         </foreach>
+	 </delete>
+
+</mapper>

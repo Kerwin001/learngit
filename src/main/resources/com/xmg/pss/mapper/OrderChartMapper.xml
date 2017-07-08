@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.OrderChartMapper">
+	<select id="query" resultType="com.xmg.pss.vo.OrderChartVO">
+		SELECT ${groupType} groupType,sum(item.number) totalNumber,sum(item.amount) totalAmount
+		FROM orderbillitem item LEFT JOIN orderbill bill ON item.bill_id=bill.id
+		LEFT JOIN product p ON item.product_id=p.id LEFT JOIN supplier s ON
+		bill.supplier_id=s.id LEFT JOIN brand b ON p.brand_id=b.id
+		LEFT JOIN employee e ON bill.inputUser_id=e.id
+		<include refid="conditionSql"/>
+		GROUP BY ${groupType}
+	</select>
+	<sql id="conditionSql">
+		<where>
+            bill.status=1
+			<if test="beginDate!=null">
+				AND bill.vdate &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null">
+				AND bill.vdate &lt;= #{endDate}
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				AND (p.name LIKE concat("%",#{keyword},"%") OR p.sn LIKE concat("%",#{keyword},"%"))
+			</if>
+			<if test="supplierId>0">
+				AND s.id=#{supplierId}
+			</if>
+			<if test="brandId>0">
+				AND b.id=#{brandId}
+			</if>
+		</where>
+	</sql>
+</mapper>

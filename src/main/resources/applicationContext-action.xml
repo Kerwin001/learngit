@@ -1,0 +1,54 @@
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans  http://www.springframework.org/schema/beans/spring-beans.xsd  http://www.springframework.org/schema/context  http://www.springframework.org/schema/context/spring-context.xsd  http://www.springframework.org/schema/aop  http://www.springframework.org/schema/aop/spring-aop.xsd  http://www.springframework.org/schema/tx  http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+
+    <bean id="systemMenuAction" class="com.xmg.pss.web.action.SystemMenuAction" scope="prototype">
+        <property name="systemMenuService" ref="systemMenuService"/>
+    </bean>
+    <bean id="brandAction" class="com.xmg.pss.web.action.BrandAction" scope="prototype">
+        <property name="brandService" ref="brandService"/>
+    </bean>
+    <bean id="supplierAction" class="com.xmg.pss.web.action.SupplierAction" scope="prototype">
+        <property name="supplierService" ref="supplierService"/>
+    </bean>
+    <bean id="productAction" class="com.xmg.pss.web.action.ProductAction" scope="prototype">
+        <property name="productService" ref="productService"/>
+        <property name="brandService" ref="brandService"/>
+    </bean>
+    <bean id="orderbillAction" class="com.xmg.pss.web.action.OrderbillAction" scope="prototype">
+        <property name="orderbillService" ref="orderbillService"/>
+        <property name="supplierService" ref="supplierService"/>
+    </bean>
+    <bean id="depotAction" class="com.xmg.pss.web.action.DepotAction" scope="prototype">
+        <property name="depotService" ref="depotService"/>
+    </bean>
+    <bean id="stockIncomeBillAction" class="com.xmg.pss.web.action.StockIncomeBillAction" scope="prototype">
+        <property name="stockIncomeBillService" ref="stockIncomeBillService"/>
+        <property name="depotService" ref="depotService"/>
+    </bean>
+    <bean id="clientAction" class="com.xmg.pss.web.action.ClientAction" scope="prototype">
+        <property name="clientService" ref="clientService"/>
+    </bean>
+    <bean id="stockOutcomeBillAction" class="com.xmg.pss.web.action.StockOutcomeBillAction" scope="prototype">
+        <property name="stockOutcomeBillService" ref="stockOutcomeBillService"/>
+        <property name="clientService" ref="clientService"/>
+        <property name="depotService" ref="depotService"/>
+    </bean>
+    <bean id="productStockAction" class="com.xmg.pss.web.action.ProductStockAction" scope="prototype">
+        <property name="productStockService" ref="productStockService"/>
+        <property name="depotService" ref="depotService"/>
+        <property name="brandService" ref="brandService"/>
+    </bean>
+    <bean id="orderChartAction" class="com.xmg.pss.web.action.OrderChartAction" scope="prototype">
+        <property name="orderChartService" ref="orderChartService"/>
+        <property name="supplierService" ref="supplierService"/>
+        <property name="brandService" ref="brandService"/>
+    </bean>
+    <bean id="saleChartAction" class="com.xmg.pss.web.action.SaleChartAction" scope="prototype">
+        <property name="saleChartService" ref="saleChartService"/>
+        <property name="clientService" ref="clientService"/>
+        <property name="brandService" ref="brandService"/>
+    </bean>
+</beans>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-Mapper.dtd">
+<mapper namespace="com.xmg.pss.mapper.TeacherMapper">
+
+	<resultMap type="teacher" id="base_mapping">
+		<id column="id" property="id"/>
+		<id column="name" property="name"/>
+	</resultMap>
+	
+	<insert id="save" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO teacher(name)VALUES(#{name})
+	</insert>
+	
+	<select id="get" resultMap="base_mapping">
+		SELECT * FROM teacher WHERE id=#{id}
+	</select>
+</mapper>

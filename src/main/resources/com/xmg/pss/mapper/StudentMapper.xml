@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-Mapper.dtd">
+<mapper namespace="com.xmg.pss.mapper.StudentMapper">
+
+	<resultMap type="student" id="base_mapping">
+		<id column="id" property="id"/>
+		<id column="name" property="name"/>
+		<collection property="teachers" ofType="teacher">
+			<id column="tid" property="id"/>
+			<result column="tname" property="name"/>
+		</collection>
+	</resultMap>
+	
+	<insert id="save" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO student(name)VALUES(#{name})
+	</insert>
+	
+	<select id="get" resultMap="base_mapping">
+		SELECT s.id,s.name,t.id tid,t.name tname
+		FROM student s INNER JOIN teacher_student ts ON s.id=ts.student_id 
+		INNER JOIN teacher t ON ts.teacher_id=t.id
+		WHERE s.id=#{sid}
+	</select>
+	
+	<insert id="updateRelation">
+		INSERT INTO teacher_student SET teacher_id=#{teacherId},student_id=#{studentId}
+	</insert>
+</mapper>

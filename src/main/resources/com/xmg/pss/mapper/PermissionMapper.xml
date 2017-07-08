@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.PermissionMapper">
+	<resultMap type="permission" id="base_mapping">
+		<id column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="expression" property="expression" />
+	</resultMap>
+
+	<insert id="save">
+		INSERT INTO
+		permission(name,expression)VALUES(#{name},#{expression})
+	</insert>
+
+	<update id="delete">
+		DELETE FROM permission WHERE id=#{id}
+	</update>
+
+	<select id="list" resultMap="base_mapping">
+		SELECT * FROM permission
+	</select>
+
+	<select id="getTotalCount" resultType="long">
+		SELECT COUNT(*) FROM
+		permission
+	</select>
+
+	<select id="getListData" resultMap="base_mapping">
+		SELECT * FROM permission
+		LIMIT #{beginIndex},#{pageSize}
+	</select>
+
+	<select id="getPermissionsByRloe" resultMap="base_mapping">
+		SELECT p.* FROM
+		permission p JOIN role_permission rp ON p.id = permission_id 
+		WHERE role_id = #{id}
+	</select>
+	
+	<delete id="deleteRelationByPermission">
+		DELETE FROM role_permission WHERE permission_id=#{pid}
+	</delete>
+	
+</mapper>

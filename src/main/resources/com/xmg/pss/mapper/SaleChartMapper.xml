@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.SaleChartMapper">
+	<select id="query" resultType="com.xmg.pss.vo.SaleChartVO">
+		SELECT ${groupType} groupType,sum(sa.number) totalNumber,sum(sa.saleAmount) totalAmount,
+		sum(sa.saleAmount-sa.costAmount) grossProfit
+		FROM saleaccount sa JOIN employee e ON sa.saleman_id = e.id
+		JOIN product p ON sa.product_id = p.id JOIN brand b ON p.brand_id = b.id
+		JOIN client c ON sa.client_id = c.id
+		<include refid="conditionSql"/>
+		GROUP BY ${groupType}
+	</select>
+	<sql id="conditionSql">
+		<where>
+			<if test="beginDate!=null">
+				AND sa.vdate &gt;= #{beginDate}
+			</if>
+			<if test="endDate!=null">
+				AND sa.vdate &lt;= #{endDate}
+			</if>
+			<if test="keyword!=null and keyword!=''">
+				AND (p.name LIKE concat("%",#{keyword},"%") OR p.sn LIKE concat("%",#{keyword},"%"))
+			</if>
+			<if test="clientId>0">
+				AND c.id=#{clientId}
+			</if>
+			<if test="brandId>0">
+				AND b.id=#{brandId}
+			</if>
+		</where>
+	</sql>
+</mapper>

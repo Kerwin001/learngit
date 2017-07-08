@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/aop
+	http://www.springframework.org/schema/aop/spring-aop.xsd
+	http://www.springframework.org/schema/tx
+	http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	
+	<context:property-placeholder location="classpath:db.properties" />
+	
+	<!-- 配置事务管理器 -->
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<!-- 配置具体方法的事务管理 -->
+	<tx:advice id="txManager" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="get*" read-only="true"/>
+			<tx:method name="list*" read-only="true"/>
+			<tx:method name="query*" read-only="true"/>
+			<tx:method name="*"/>
+		</tx:attributes>
+	</tx:advice>
+
+	<!-- 将事务管理织入到程序中 -->
+	<aop:config>
+		 <aop:pointcut expression="execution(* com.xmg.pss.service.*.*(..))" id="pc"/>
+		<aop:advisor advice-ref="txManager" pointcut-ref="pc"/>
+	</aop:config>
+
+
+
+	<!-- 配置连接池 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<property name="driverClassName" value="${db.driver}"></property>
+		<property name="url" value="${db.url}"></property>
+		<property name="username" value="${db.username}"></property>
+		<property name="password" value="${db.password}"></property>
+		<property name="filters" value="config,stat"/>
+		<property name="connectProperties" value="config.decrypt=true"/>
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 导入mybatis配置文件 -->
+		<property name="configLocation" value="classpath:mybatis-config.xml" />
+		<!-- 载入映射文件 -->
+		<property name="mapperLocations" value="classpath:com/xmg/pss/mapper/*Mapper.xml" />
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="typeAliasesPackage" value="com.xmg.pss.domain"></property>
+	</bean>
+	<!-- 配置Department -->
+	<bean id="deptMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.DepartmentMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<bean id="deptService" class="com.xmg.pss.service.impl.DepartmentServiceImpl">
+		<property name="deptMapper" ref="deptMapper"></property>
+	</bean>
+
+	<bean id="departmentAction" class="com.xmg.pss.web.action.DepartmentAction" scope="prototype">
+		<property name="deptService" ref="deptService"></property>
+	</bean>
+	
+	<!-- 配置Employee -->
+	<bean id="empMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.EmployeeMapper"/>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<bean id="empService" class="com.xmg.pss.service.impl.EmployeeServiceImpl">
+		<property name="empMapper" ref="empMapper"></property>
+	</bean>
+	
+	<bean id="employeeAction" class="com.xmg.pss.web.action.EmployeeAction" scope="prototype">
+		<property name="empService" ref="empService"/>
+		<property name="deptService" ref="deptService"/>
+		<property name="roleService" ref="roleService"/>
+	</bean>
+	
+	<!-- 配置student -->
+	<bean id="stuMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.StudentMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 配置teacher -->
+	<bean id="teaMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.TeacherMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<!-- 配置permission -->
+	<bean id="permissionMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.PermissionMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<bean id="permissionService" class="com.xmg.pss.service.impl.PermissionServiceImpl">
+		<property name="permissionMapper" ref="permissionMapper"></property>
+	</bean>
+	
+	<bean id="permissionAction" class="com.xmg.pss.web.action.PermissionAction" scope="prototype">
+		<property name="permissionService" ref="permissionService"/>
+	</bean>
+	
+	<!-- 配置role -->
+	<bean id="roleMapper" class="org.mybatis.spring.mapper.MapperFactoryBean">
+		<property name="mapperInterface" value="com.xmg.pss.mapper.RoleMapper"></property>
+		<property name="sqlSessionFactory" ref="sqlSessionFactory"></property>
+	</bean>
+	
+	<bean id="roleService" class="com.xmg.pss.service.impl.RoleServiceImpl">
+		<property name="roleMapper" ref="roleMapper"></property>
+	</bean>
+	
+	<bean id="roleAction" class="com.xmg.pss.web.action.RoleAction" scope="prototype">
+		<property name="roleService" ref="roleService"/>
+		<property name="permissionService" ref="permissionService"/>
+		<property name="systemMenuService" ref="systemMenuService"/>
+	</bean>
+
+	<import resource="classpath:applicationContext-mapper.xml"/>
+	<import resource="classpath:applicationContext-service.xml"/>
+	<import resource="classpath:applicationContext-action.xml"/>
+</beans>

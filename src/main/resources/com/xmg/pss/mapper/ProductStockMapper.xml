@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.ProductStockMapper">
+    <resultMap id="BaseResultMap" type="com.xmg.pss.domain.ProductStock">
+        <id column="id" property="id"/>
+        <result column="amount" property="amount"/>
+        <result column="storeNumber" property="storeNumber"/>
+        <result column="price" property="price"/>
+        <association property="depot" column="depot_id" select="com.xmg.pss.mapper.DepotMapper.get"/>
+        <association property="product" column="product_id" select="com.xmg.pss.mapper.ProductMapper.get"/>
+    </resultMap>
+
+    <resultMap id="listMapping" type="com.xmg.pss.domain.ProductStock">
+        <id column="ps_id" property="id"/>
+        <result column="ps_price" property="price"/>
+        <result column="ps_number" property="storeNumber"/>
+        <result column="ps_amount" property="amount"/>
+        <association property="product" javaType="Product">
+            <id column="p_id" property="id"/>
+            <result column="p_sn" property="sn"/>
+            <result column="p_name" property="name"/>
+            <association property="brand" javaType="Brand">
+                <id column="b_id" property="id"/>
+                <result column="b_name" property="name"/>
+            </association>
+        </association>
+        <association property="depot" javaType="Depot">
+            <id column="d_id" property="id"/>
+            <result column="d_name" property="name"/>
+        </association>
+    </resultMap>
+
+    <delete id="delete" parameterType="long">
+    delete from productStock where id = #{id}
+  </delete>
+    <insert id="save" parameterType="com.xmg.pss.domain.ProductStock" useGeneratedKeys="true" keyProperty="id">
+    insert into productStock 
+    (amount,product_id,storeNumber,price,depot_id)
+    values
+    (#{amount},#{product.id},#{storeNumber},#{price},#{depot.id})
+  </insert>
+    <update id="update" parameterType="com.xmg.pss.domain.ProductStock">
+    update productStock
+    set
+	    amount=#{amount},
+	    product_id=#{product.id},
+	    storeNumber=#{storeNumber},
+	    price=#{price},
+	    depot_id=#{depot.id}
+    where id = #{id}
+  </update>
+    <select id="get" resultMap="BaseResultMap" parameterType="long">
+    select * from productStock where id = #{id}
+  </select>
+    <select id="list" resultMap="BaseResultMap">
+    select * from productStock
+  </select>
+    <sql id="conditionSql">
+        <where>
+            <if test="keyword!=null and keyword!=''">
+              AND (p.name LIKE concat("%",#{keyword},"%") OR p.sn LIKE concat("%",#{keyword},"%"))
+            </if>
+            <if test="depotId>0">
+                AND d.id=#{depotId}
+            </if>
+            <if test="brandId>0">
+                AND b.id=#{brandId}
+            </if>
+            <if test="limitNum!=null">
+                AND ps.storeNumber = #{limitNum}
+            </if>
+        </where>
+    </sql>
+    <select id="getTotalCount" resultType="long">
+        SELECT COUNT(*)
+        <include refid="fromSql"/>
+        <include refid="conditionSql"/>
+    </select>
+
+
+    <sql id="selectSql">
+        SELECT  ps.id ps_id,p.id p_id,d.id d_id,b.id b_id,p.sn p_sn,p.name p_name,d.name d_name,b.name
+         b_name,ps.price ps_price,ps.storeNumber ps_number,ps.amount ps_amount
+    </sql>
+    <sql id="fromSql">
+        FROM productstock ps JOIN depot d ON ps.depot_id = d.id
+    JOIN product p ON ps.product_id = p.id JOIN brand b ON p.brand_id = b.id
+    </sql>
+    <select id="pageQuery" resultMap="listMapping">
+        <include refid="selectSql"/>
+        <include refid="fromSql"/>
+        <include refid="conditionSql"/>
+        limit #{beginIndex},#{pageSize}
+    </select>
+    <select id="getByDepotAndProduct" resultMap="BaseResultMap">
+        SELECT * FROM productStock WHERE product_id=#{productId} AND depot_id=#{depotId}
+    </select>
+</mapper>

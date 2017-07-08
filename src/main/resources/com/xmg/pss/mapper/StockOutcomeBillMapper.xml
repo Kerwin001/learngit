@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.StockOutcomeBillMapper">
+    <resultMap id="BaseResultMap" type="com.xmg.pss.domain.StockOutcomeBill">
+        <id column="id" property="id"/>
+        <result column="sn" property="sn"/>
+        <result column="vdate" property="vdate"/>
+        <result column="status" property="status"/>
+        <result column="totalAmount" property="totalAmount"/>
+        <result column="totalNumber" property="totalNumber"/>
+        <result column="inputTime" property="inputTime"/>
+        <result column="auditTime" property="auditTime"/>
+        <association property="auditor" column="auditor_id" select="com.xmg.pss.mapper.EmployeeMapper.get"/>
+        <association property="inputUser" column="inputUser_id" select="com.xmg.pss.mapper.EmployeeMapper.get"/>
+        <association property="depot" column="depot_id" select="com.xmg.pss.mapper.DepotMapper.get"/>
+        <association property="client" column="client_id" select="com.xmg.pss.mapper.ClientMapper.get"/>
+        <collection property="items" column="id" select="getItemsByBillId"/>
+    </resultMap>
+    <resultMap id="BaseItemResultMap" type="StockOutcomeBillItem">
+        <id column="id" property="id"/>
+        <result column="salePrice" property="salePrice"/>
+        <result column="number" property="number"/>
+        <result column="amount" property="amount"/>
+        <result column="remark" property="remark"/>
+        <association property="product" column="product_id" select="com.xmg.pss.mapper.ProductMapper.get"/>
+        <association property="bill" column="bill_id" select="get"/>
+    </resultMap>
+    <delete id="delete" parameterType="long">
+    delete from stockOutcomeBill where id = #{id}
+  </delete>
+    <insert id="save" parameterType="com.xmg.pss.domain.StockOutcomeBill" useGeneratedKeys="true" keyProperty="id">
+    insert into stockOutcomeBill 
+    (sn,auditor_id,vdate,status,auditTime,inputTime,depot_id,totalAmount,totalNumber,inputUser_id,client_id)
+    values
+    (#{sn},#{auditor.id},#{vdate},#{status},#{auditTime},#{inputTime},#{depot.id},#{totalAmount},#{totalNumber},#{inputUser.id},#{client.id})
+  </insert>
+    <update id="update" parameterType="com.xmg.pss.domain.StockOutcomeBill">
+    update stockOutcomeBill
+    set
+	    sn=#{sn},
+	    vdate=#{vdate},
+	    depot_id=#{depot.id},
+	    client_id=#{client.id},
+	    totalAmount=#{totalAmount},
+	    totalNumber=#{totalNumber}
+    where id = #{id}
+  </update>
+    <select id="get" resultMap="BaseResultMap" parameterType="long">
+    select * from stockOutcomeBill where id = #{id}
+  </select>
+    <select id="list" resultMap="BaseResultMap">
+    select * from stockOutcomeBill
+  </select>
+    <sql id="conditionSql">
+        <where>
+            <if test="beginDate!=null">
+                vdate &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null">
+                AND vdate &lt;= #{endDate}
+            </if>
+            <if test="depotId>0">
+                AND depot_id=#{depotId}
+            </if>
+            <if test="clientId>0">
+                AND client_id=#{clientId}
+            </if>
+            <if test="status>-1">
+                AND status=#{status}
+            </if>
+        </where>
+    </sql>
+    <select id="getTotalCount" resultType="long">
+        select count(*) from stockOutcomeBill
+        <include refid="conditionSql"/>
+    </select>
+    <select id="pageQuery" resultMap="BaseResultMap">
+        select * from stockOutcomeBill
+        <include refid="conditionSql"/>
+        limit #{beginIndex},#{pageSize}
+    </select>
+    <insert id="saveItem">
+        INSERT INTO stockOutcomebillitem(salePrice,number,amount,remark,product_id,bill_id)
+        VALUES (#{salePrice},#{number},#{amount},#{remark},#{product.id},#{bill.id})
+    </insert>
+    <select id="getItemsByBillId" resultMap="BaseItemResultMap">
+        SELECT * FROM stockOutcomebillitem WHERE bill_id=#{id}
+    </select>
+    <delete id="deleteItemsByBillId">
+        DELETE FROM stockOutcomebillitem WHERE bill_id=#{id}
+    </delete>
+    <update id="audit">
+         update stockOutcomeBill
+    set
+        auditor_id=#{auditor.id},
+        auditTime=#{auditTime},
+        status=#{status}
+    where id = #{id}
+    </update>
+</mapper>

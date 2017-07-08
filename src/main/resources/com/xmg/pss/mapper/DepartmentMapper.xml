@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.xmg.pss.mapper.DepartmentMapper">
+	<cache type="org.mybatis.caches.ehcache.EhcacheCache"/>
+	<resultMap type="department" id="dept_mapping">
+		<id column="id" property="id"/>
+		<id column="name" property="name"/>
+		<id column="sn" property="sn"/>
+	</resultMap>
+	
+	<sql id="column_sql">
+		id,name,sn
+	</sql>
+	
+	<insert id="save" useGeneratedKeys="true" keyColumn="id" keyProperty="id" flushCache="false">
+		INSERT INTO department(name,sn)VALUES(#{name},#{sn})
+	</insert>
+	<update id="update">
+		UPDATE department 
+		<set>
+			<if test="name!=null and name!=''">name=#{name},</if>
+			<if test="sn!=null and name!=''">sn=#{sn}</if>
+		</set>
+		WHERE id=#{id}
+	</update>
+	<delete id="delete">
+		DELETE FROM department WHERE id=#{id}
+	</delete>
+	<select id="get" resultMap="dept_mapping">
+		SELECT <include refid="column_sql"/> FROM department WHERE id=#{id}
+	</select>
+	<select id="list" resultMap="dept_mapping" useCache="false">
+		SELECT <include refid="column_sql"/> FROM department
+	</select>
+	
+	<select id="getTotalCount" resultType="long">
+			SELECT COUNT(*) FROM department 
+	</select>
+	
+	<select id="getListData" resultMap="dept_mapping" useCache="false">
+		SELECT <include refid="column_sql"/> FROM department
+		LIMIT #{beginIndex},#{pageSize}
+	</select>
+	
+	<update id="deleteRelationByDept">
+		UPDATE employee SET dept_id=NULL WHERE dept_id=#{did}
+	</update>
+	
+</mapper>
